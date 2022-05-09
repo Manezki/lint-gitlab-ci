@@ -36,12 +36,10 @@ func (j Job) completeScript() string {
 }
 
 func (j Job) inferShell() string {
-	switch strings.ToLower(j.Image) {
-	case "docker":
+	switch img := strings.ToLower(j.Image); {
+	case strings.HasPrefix(img, "docker"):
 		return "sh"
-	case "python":
-		return "bash"
-	case "":
+	case strings.HasPrefix(img, "python"):
 		return "bash"
 	default:
 		fmt.Printf("Cannot infer shell type for '%s'. Defaulting to 'bash'\n", j.Image)

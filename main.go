@@ -18,7 +18,7 @@ type Job struct {
 	Stage       string   `yaml:"stage"`
 }
 
-func (j Job) completeScript() string {
+func (j Job) getScript() string {
 	builder := strings.Builder{}
 	for _, l := range j.BeforeScipt {
 		builder.Write([]byte(l))
@@ -72,7 +72,7 @@ func main() {
 		}
 		defer fp.Close()
 
-		fp.Write([]byte(job.completeScript()))
+		fp.Write([]byte(job.getScript()))
 
 		cmd := exec.Command("shellcheck", fmt.Sprintf("--shell=%s", job.inferShell()), tmpFile)
 		out, err := cmd.Output()

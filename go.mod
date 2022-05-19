@@ -1,4 +1,4 @@
-module github.com/Manezki/gitlab-ci-script-linter
+module github.com/Manezki/lint-gitlab-ci
 
 go 1.18
 

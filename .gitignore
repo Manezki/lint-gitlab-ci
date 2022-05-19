@@ -16,3 +16,6 @@
 
 # Go workspace file
 go.work
+
+# Output binaries
+lint-gitlab-ci

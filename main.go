@@ -1,12 +1,14 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
 
+	"github.com/gobwas/glob"
 	"gopkg.in/yaml.v3"
 )
 
@@ -48,7 +50,22 @@ func (j Job) inferShell() string {
 }
 
 func main() {
-	content, _ := os.ReadFile(os.Args[1])
+
+	var filterArg string
+
+	flag.StringVar(&filterArg, "filter", "*", "Filter by job name.")
+
+	flag.Parse()
+	posArgs := flag.Args()
+
+	filter := glob.MustCompile(filterArg)
+
+	if len(posArgs) == 0 {
+		fmt.Print("No path to .gitlab-ci.yml file\n")
+		os.Exit(0)
+	}
+
+	content, _ := os.ReadFile(posArgs[0])
 
 	jobs := make(map[string]Job, 1)
 
@@ -64,6 +81,9 @@ func main() {
 	defer os.RemoveAll(dir)
 
 	for name, job := range jobs {
+		if !filter.Match(name) {
+			continue
+		}
 		tmpFile := path.Join(dir, name)
 		fp, err := os.Create(tmpFile)
 		if err != nil {

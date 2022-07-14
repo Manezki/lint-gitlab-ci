@@ -65,11 +65,15 @@ func main() {
 		os.Exit(0)
 	}
 
-	content, _ := os.ReadFile(posArgs[0])
+	content, err := os.ReadFile(posArgs[0])
+	if err != nil {
+		fmt.Printf("Error reading the file: %v\n", err)
+		os.Exit(1)
+	}
 
 	jobs := make(map[string]Job, 1)
 
-	err := yaml.Unmarshal(content, &jobs)
+	err = yaml.Unmarshal(content, &jobs)
 	if err != nil {
 		fmt.Printf("%s\n", err)
 	}
@@ -87,7 +91,7 @@ func main() {
 		tmpFile := path.Join(dir, name)
 		fp, err := os.Create(tmpFile)
 		if err != nil {
-			fmt.Printf("%s\n", err)
+			fmt.Printf("Error creating output file: %v\n", err)
 			os.Exit(1)
 		}
 		defer fp.Close()
@@ -96,6 +100,7 @@ func main() {
 
 		cmd := exec.Command("shellcheck", fmt.Sprintf("--shell=%s", job.inferShell()), tmpFile)
 		out, err := cmd.Output()
+		// Shellcheck output is != nil when any lint errors arise
 		if err != nil {
 			fmt.Print("===============================================\n")
 			fmt.Printf("%s\n", out)
